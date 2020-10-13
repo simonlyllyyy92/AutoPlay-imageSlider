@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { css, jsx } from '@emotion/core'
 import SliderContent from './SliderContent'
 import Slide from './Slide'
@@ -10,7 +10,7 @@ import Dots from './Dots'
  * @function Slider
  */
 
-const Slider = ({slides}) => {
+const Slider = ({slides, autoPlay}) => {
   const getWidth = () => window.innerWidth
 
   const [state, setState] = useState({
@@ -20,6 +20,23 @@ const Slider = ({slides}) => {
   })
 
   const { translate, transition, activeIndex } = state
+
+  const autoPlayRef = useRef()
+
+  useEffect(() => {
+    autoPlayRef.current = nextSlide
+  })
+
+  useEffect(() => {
+    const play = () => {
+      autoPlayRef.current()
+    }
+   
+    if(autoPlay !== null) {
+      const interval = setInterval(play, autoPlay * 1000)
+      return () => clearInterval(interval) // clear the interval
+    }
+  }, [autoPlay])
 
   const nextSlide = () => {
     if(activeIndex === slides.length - 1){
@@ -64,11 +81,22 @@ const Slider = ({slides}) => {
         {slides.map(item => <Slide key={item} content={item}/>)}
         {/* */}
       </SliderContent>
-      <Arrow direction = "left" handleClick = {prevSlide}/>
-      <Arrow direction = "right" handleClick = {nextSlide}/>
+      {
+        !autoPlay && (
+          <>
+            <Arrow direction = "left" handleClick = {prevSlide}/>
+            <Arrow direction = "right" handleClick = {nextSlide}/>
+          </>
+        )
+      }
       <Dots slides={slides} activeIndex={activeIndex}/>
     </div>
   )
+}
+
+Slider.defaultProps = {
+  slides:[],
+  autoPlay:null
 }
 
 const SliderCSS = css`
