@@ -12,6 +12,6 @@ const images = [
 ]
 
 ReactDOM.render(
-  <Slider slides={images} autoPlay={2}/>,
+  <Slider slides={images} autoPlay={2} />,
   document.getElementById("app")
 );
