@@ -12,7 +12,7 @@ const getWidth = () => window.innerWidth
  * @function Slider
  */
 
-const Slider = ({slides, autoPlay}) => {
+const Slider = ({slides, autoPlay, is_auto}) => {
 
   const firstSlide = slides[0]
   const secondSlide = slides[1]
@@ -38,39 +38,39 @@ const Slider = ({slides, autoPlay}) => {
   })
 
   useEffect(() => {
-    const play = () => {
-      autoPlayRef.current()
-    }
-
     const smooth = (e) => {
       if(e.target.className.includes('SliderContent')){
         transitionRef.current()
       }
     }
-
     const resize = () => {
       resizeRef.current()
     }
-
-    let interval = null
     const transitionEnd = window.addEventListener('transitionend', smooth)
     const onResize = window.addEventListener('resize', resize)
-    
-    if(autoPlay) {
-      interval = setInterval(play, autoPlay * 1000)
-    }
+
     return () => {
       window.removeEventListener('transitionend', transitionEnd)
       window.removeEventListener('resize', onResize)
-      if(autoPlay) {
-        clearInterval(interval) // clear the interval
-      }
     }
-  }, [autoPlay])
+  }, [])
+
+  useEffect(() => {
+    let interval = null
+    const play = () => {
+      autoPlayRef.current()
+    }
+    if(is_auto){
+      interval = setInterval(play, autoPlay * 1000)
+    }
+
+    return () => clearInterval(interval)
+  }, [is_auto])
+
 
   const smoothTransition = () => {
     let _slides = []
-
+    console.log('smooth')
     // We're at the last slide.
     if (activeSlide === slides.length - 1)
       _slides = [slides[slides.length - 2], lastSlide, firstSlide]
@@ -120,7 +120,7 @@ const Slider = ({slides, autoPlay}) => {
         {/* */}
       </SliderContent>
       {
-        !autoPlay && (
+        !is_auto && (
           <>
             <Arrow direction = "left" handleClick = {prevSlide}/>
             <Arrow direction = "right" handleClick = {nextSlide}/>
